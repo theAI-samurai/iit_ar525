@@ -28,7 +28,10 @@ Implement the complete policy iteration algorithm by alternating between evaluat
 ### Part 5: Value Iteration
 Implement value iteration using the Bellman optimality equation.
 
-For each part, you are expected to:
+### Part 6: Unseen environment
+Your code will be tested in a different environment, where obstacle positions will be varied, and the grid shape will also be varied. The goal is to evaluate the adaptability and robustness of your implementation.
+
+For part 1-5, you are expected to:
 - Implement the function in `utils.py`
 - Ensure it converges correctly
 - Test with the provided grid environment
@@ -42,7 +45,7 @@ For each part, you are expected to:
     - Draw a green trail showing the end-effector trajectory
     - Add visualization of value function as a heatmap
 
-![](sample_gif.gif)
+[](sample_gif.gif)
 
 - **Analysis report** including but not limited to:
    - Comparing Policy Iteration vs Value Iteration
@@ -138,8 +141,8 @@ After implementing DP algorithms, add code to:
 ### Note
 - This assignment is to be done in pairs (working in pairs is recommended and will be rewarded). The choice is yours.
 
-- Please submit it on google form as a single zip file named <A1_StudentID>.zip or <A1_StudentID1_StudentID2>.zip. The zip file should contain a full code, running instructions, and analysis in the PDF file.
-- The submission date is 5:00 pm IST on Thursday, 5 Feb, 2026. Late submission will incur a daily 10% score adjustment for up to two days.
+- Please submit it on [**Google Form**](https://forms.gle/aGHFXwcEFYn2MvVm9) as a single zip file named <A1_StudentID>.zip or <A1_StudentID1_StudentID2>.zip. The zip file should contain a full code, running instructions, and analysis in the PDF file.
+- The submission date is **5:00 pm IST on Thursday, 5 Feb, 2026**. Late submission will incur a daily 10% score adjustment for up to two days.
 
 ### Grading Criteria
 - **Implementation (60%)**:
@@ -192,4 +195,4 @@ After implementing DP algorithms, add code to:
 **Good luck with your implementation! 🚀**
 
 ## Acknowledgements
-Thanks Jagannath Prasad Sahoo (@Jaggu2606) and Dharmendra Sharma (TAs) for their help in preparing this assignment.
+Thanks Jagannath Prasad Sahoo [(@Jaggu2606)](https://github.com/Jaggu2606) and Dharmendra Sharma (TAs) for their help in preparing this assignment.
