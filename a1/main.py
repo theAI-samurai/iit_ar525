@@ -31,7 +31,7 @@ from utils import (
 )
 
 
-
+ 
 def state_to_position(state, rows, cols, grid_size=0.10, 
                       table_center=[0, -0.3, 0.65], z_offset=0.10):
 
@@ -154,13 +154,132 @@ if __name__ == "__main__":
                        [goal_pos[0]-half, goal_pos[1]-half, goal_pos[2]], red, 3, 0)
     
 
-    try:
-        while True:
-            p.stepSimulation()
-            time.sleep(1./240.)
-    except:
-        pass
+    # Let the scene settle briefly before running DP / animation
+    for _ in range(240):  # ~1 second at 240 Hz
+        p.stepSimulation()
+        time.sleep(1./240.)
 
     # ============================================================
     # TODO: Implement DP algorithms in utils.py, then add simulation code here
     # ============================================================
+
+    # ============================================================
+    # Run DP → get optimal policy
+    # ============================================================
+
+    print("\nRunning Policy Iteration...")
+    V_pi, policy_pi = policy_iteration(env, gamma=GAMMA, theta=1e-6)
+
+    print("\nRunning Value Iteration...")
+    V_vi, policy_vi = value_iteration(env, gamma=GAMMA, theta=1e-6)
+
+    # Choose which one to visualize (you can compare both later)
+    # For now we use policy iteration result
+    V = V_pi
+    policy = policy_pi
+    method_name = "Policy Iteration"
+
+    # V = V_vi
+    # policy = policy_vi
+    # method_name = "Value Iteration"
+
+    print(f"\nUsing policy from {method_name}")
+
+    # ============================================================
+    # Extract path
+    # ============================================================
+    path = env.get_optimal_path(policy)
+
+    if not path:
+        print("No path found → check your policy / implementation")
+        path = [env.start]  # at least show start
+    else:
+        print(f"Optimal path found ({len(path)} steps):")
+        print(" → ".join(map(str, path)))
+
+    # ============================================================
+    # Optional: Print value function as text grid
+    # ============================================================
+    print(f"\nValue function ({method_name}):")
+    v_grid = V.reshape(env.rows, env.cols)
+    for r in range(env.rows):
+        row_str = " ".join(f"{v_grid[r,c]:6.1f}" for c in range(env.cols))
+        print(row_str)
+
+    # ============================================================
+    # Visualization: heatmap in console is already done above
+    # Now move robot + draw green trail in PyBullet
+    # ============================================================
+
+    # Colors
+    green = [0, 1, 0, 1]          # RGBA
+    trail_width = 2.0
+    trail_life_time = 0.0         # 0 = permanent
+
+    prev_pos = None
+
+    for i, state in enumerate(path):
+        target_pos = state_to_position(
+            state, env.rows, env.cols,
+            grid_size=0.10,
+            table_center=[0, -0.3, 0.65],
+            z_offset=0.12               # slightly higher to avoid table
+        )
+
+        # Draw green trail (line between consecutive waypoints)
+        if prev_pos is not None:
+            p.addUserDebugLine(
+                prev_pos,
+                target_pos,
+                lineColorRGB=[0, 1, 0],
+                lineWidth=trail_width,
+                lifeTime=trail_life_time
+            )
+
+        # Move UR5 end-effector to this position
+        # We use orientation pointing downwards (typical for pick/place)
+        orientation = p.getQuaternionFromEuler([0, np.pi, 0])  # gripper down
+
+        try:
+            joint_poses = p.calculateInverseKinematics(
+                ur5_id,
+                endEffectorLinkIndex=7,           # usually link 7 = tool tip for UR5
+                targetPosition=target_pos,
+                targetOrientation=orientation,
+                maxNumIterations=100,
+                residualThreshold=1e-5
+            )
+
+            for joint_idx in range(p.getNumJoints(ur5_id)):
+                # Skip fixed / passive joints if needed
+                joint_info = p.getJointInfo(ur5_id, joint_idx)
+                if joint_info[2] != p.JOINT_FIXED:  # only controllable joints
+                    p.setJointMotorControl2(
+                        ur5_id,
+                        joint_idx,
+                        p.POSITION_CONTROL,
+                        targetPosition=joint_poses[joint_idx],
+                        force=800,
+                        maxVelocity=1.5
+                    )
+
+            # Give some time for the robot to reach ≈ position
+            for _ in range(240 * 2):   # ≈ 2 seconds at 240 Hz
+                p.stepSimulation()
+                time.sleep(1./240.)
+
+        except Exception as e:
+            print(f"IK failed at state {state}: {e}")
+            # continue anyway — show at least the trail
+
+        prev_pos = target_pos
+
+    print("Simulation finished. Robot should have followed the path.")
+
+    # Keep window open until user closes it
+    try:
+        while p.isConnected():
+            p.stepSimulation()
+            time.sleep(1./240.)
+    except:
+        pass
