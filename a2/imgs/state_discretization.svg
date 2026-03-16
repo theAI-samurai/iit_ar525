@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="480" viewBox="0 0 960 480">
+<rect x="0" y="0" width="100%" height="100%" fill="#ffffff" />
+<style>
+.title { font: 600 16px Arial, sans-serif; fill: #111; }
+.label { font: 12px Arial, sans-serif; fill: #333; }
+.small { font: 10px Arial, sans-serif; fill: #666; }
+.grid { stroke: #d0d0d0; stroke-width: 1; }
+.axis { stroke: #888; stroke-width: 1.2; }
+.border { stroke: #999; stroke-width: 1.2; fill: none; }
+.target { fill: #d62728; }
+.target-line { stroke: #d62728; stroke-width: 2; }
+</style>
+<text x="240.0" y="22" text-anchor="middle" class="title">XY Discretization (10x10 bins)</text>
+<text x="720.0" y="22" text-anchor="middle" class="title">Z Discretization (10 bins)</text>
+<rect x="30" y="30" width="420" height="420" class="border" />
+<rect x="510" y="30" width="420" height="420" class="border" />
+<line x1="30.0" y1="450.0" x2="30.0" y2="30.0" class="grid" />
+<line x1="30.0" y1="450.0" x2="450.0" y2="450.0" class="grid" />
+<line x1="72.0" y1="450.0" x2="72.0" y2="30.0" class="grid" />
+<line x1="30.0" y1="408.0" x2="450.0" y2="408.0" class="grid" />
+<line x1="114.0" y1="450.0" x2="114.0" y2="30.0" class="grid" />
+<line x1="30.0" y1="366.0" x2="450.0" y2="366.0" class="grid" />
+<line x1="156.0" y1="450.0" x2="156.0" y2="30.0" class="grid" />
+<line x1="30.0" y1="324.0" x2="450.0" y2="324.0" class="grid" />
+<line x1="198.0" y1="450.0" x2="198.0" y2="30.0" class="grid" />
+<line x1="30.0" y1="282.0" x2="450.0" y2="282.0" class="grid" />
+<line x1="240.0" y1="450.0" x2="240.0" y2="30.0" class="grid" />
+<line x1="30.0" y1="240.0" x2="450.0" y2="240.0" class="grid" />
+<line x1="282.0" y1="450.0" x2="282.0" y2="30.0" class="grid" />
+<line x1="30.0" y1="198.0" x2="450.0" y2="198.0" class="grid" />
+<line x1="324.0" y1="450.0" x2="324.0" y2="30.0" class="grid" />
+<line x1="30.0" y1="156.0" x2="450.0" y2="156.0" class="grid" />
+<line x1="366.0" y1="450.0" x2="366.0" y2="30.0" class="grid" />
+<line x1="30.0" y1="113.99999999999999" x2="450.0" y2="113.99999999999999" class="grid" />
+<line x1="408.0" y1="450.0" x2="408.0" y2="30.0" class="grid" />
+<line x1="30.0" y1="72.0" x2="450.0" y2="72.0" class="grid" />
+<line x1="450.0" y1="450.0" x2="450.0" y2="30.0" class="grid" />
+<line x1="30.0" y1="30.0" x2="450.0" y2="30.0" class="grid" />
+<text x="240.0" y="472" text-anchor="middle" class="label">x (range [-1.0, 1.0])</text>
+<text x="12" y="240.0" text-anchor="middle" class="label" transform="rotate(-90 12 240.0)">y (range [-1.0, 1.0])</text>
+<text x="30" y="490" class="small">Bin width: 0.20</text>
+<circle cx="240.0" cy="240.0" r="4.5" class="target" />
+<text x="248.0" y="232.0" class="small" fill="#d62728">Target XY (0,0)</text>
+<line x1="510" y1="450.0" x2="930" y2="450.0" class="grid" />
+<line x1="510" y1="408.0" x2="930" y2="408.0" class="grid" />
+<line x1="510" y1="366.0" x2="930" y2="366.0" class="grid" />
+<line x1="510" y1="324.0" x2="930" y2="324.0" class="grid" />
+<line x1="510" y1="282.0" x2="930" y2="282.0" class="grid" />
+<line x1="510" y1="240.0" x2="930" y2="240.0" class="grid" />
+<line x1="510" y1="198.0" x2="930" y2="198.0" class="grid" />
+<line x1="510" y1="156.0" x2="930" y2="156.0" class="grid" />
+<line x1="510" y1="113.99999999999999" x2="930" y2="113.99999999999999" class="grid" />
+<line x1="510" y1="72.0" x2="930" y2="72.0" class="grid" />
+<line x1="510" y1="30.0" x2="930" y2="30.0" class="grid" />
+<text x="492" y="240.0" text-anchor="middle" class="label" transform="rotate(-90 492 240.0)">z (range [0.0, 2.0])</text>
+<text x="510" y="472" class="small">Bin height: 0.20</text>
+<line x1="510" y1="240.0" x2="930" y2="240.0" class="target-line" />
+<text x="518" y="232.0" class="small" fill="#d62728">Target z=1.0</text>
+<rect x="790" y="40" width="130" height="52" fill="#f7f7f7" stroke="#ccc" />
+<circle cx="802" cy="56" r="4" class="target" />
+<text x="812" y="60" class="small">Target position</text>
+<line x1="798" y1="74" x2="810" y2="74" class="grid" />
+<text x="812" y="78" class="small">Bin boundary</text>
+</svg>
