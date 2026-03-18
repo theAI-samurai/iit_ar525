@@ -96,30 +96,15 @@ def extract_position(obs):
         return obs_arr[0, 0:3]
     return obs_arr[0:3]
 
-def evaluate_policy(env, q_table, num_episodes=20, q_table2=None):
-    """
-    Evaluate greedy policy.
-
-    Args:
-        env:          The environment to evaluate in.
-        q_table:      Primary Q-table (or Q1 for Double Q-Learning).
-        num_episodes: Number of evaluation roll-outs (default 20 for a
-                      more stable mean estimate).
-        q_table2:     Optional second Q-table (Q2). When provided, actions
-                      are selected via argmax(Q1 + Q2), mirroring the
-                      training-time selection rule used in Double Q-Learning.
-    """
+def evaluate_policy(env, q_table, num_episodes=10):
+    """Evaluate greedy policy."""
     rewards = []
     for _ in range(num_episodes):
         state, _ = env.reset()
         state = discretize_state(extract_position(state))
         total_reward = 0
         for _ in range(MAX_STEPS):
-            if q_table2 is not None:
-                # Use the raw sum — same rule as during Double Q-Learning training
-                action = np.argmax(q_table[state] + q_table2[state])
-            else:
-                action = np.argmax(q_table[state])
+            action = np.argmax(q_table[state])
             next_state, reward, terminated, truncated, _ = env.step(format_action(action))
             next_state = discretize_state(extract_position(next_state))
             total_reward += reward
@@ -207,8 +192,11 @@ def run_double_q_learning(env, num_episodes=NUM_EPISODES, epsilon=EPSILON, gamma
         total_reward = 0
         
         for step in range(MAX_STEPS):
-            # Choose action using average of Q1 and Q2
-            action = np.argmax(q1[state] + q2[state])
+            # Choose action using epsilon-greedy over the sum of Q1 and Q2
+            if np.random.random() < epsilon:
+                action = np.random.randint(get_action_space_size())
+            else:
+                action = np.argmax(q1[state] + q2[state])
             
             # Take action
             next_state, reward, terminated, truncated, _ = env.step(format_action(action))
@@ -326,92 +314,51 @@ def run_td_with_replay(env, num_episodes=NUM_EPISODES, epsilon=EPSILON, gamma=GA
 # EVALUATION
 # ========================================
 
-def score_challenge(mean_reward, max_points):
-    """
-    Award partial credit using tiered thresholds.
-
-    Tier breakdown (as a fraction of max_points):
-      >= 300  → 100 %  (full marks)
-      >= 250  →  80 %
-      >= 200  →  60 %
-      >= 150  →  40 %
-       < 150  →   0 %
-
-    Returns the integer points awarded.
-    """
-    if mean_reward >= 300:
-        fraction = 1.0
-    elif mean_reward >= 250:
-        fraction = 0.8
-    elif mean_reward >= 200:
-        fraction = 0.6
-    elif mean_reward >= 150:
-        fraction = 0.4
-    else:
-        fraction = 0.0
-    return round(fraction * max_points)
-
-
 def evaluate_bonus_challenges():
     """Evaluate bonus challenge implementations."""
     print("=" * 60)
     print("EVALUATING BONUS CHALLENGES")
     print("=" * 60)
-
-    total_points = 0
-
-    # ------------------------------------------------------------------
+    
     # SARSA Evaluation
-    # ------------------------------------------------------------------
     print("\n--- Challenge 1: SARSA (5 points) ---")
     env = HoverAviary(obs=ObservationType.KIN, act=ActionType.ONE_D_RPM, gui=False)
     try:
         q_table_sarsa, rewards_sarsa = run_sarsa(env)
         mean_sarsa, std_sarsa = evaluate_policy(env, q_table_sarsa)
-        pts = score_challenge(mean_sarsa, max_points=5)
-        total_points += pts
         print(f"SARSA Evaluation: {mean_sarsa:.2f} (+/- {std_sarsa:.2f})")
-        print(f"Bonus Points: {pts}/5")
+        print(f"Bonus Points: {5 if mean_sarsa >= 300 else 0}/5")
     except Exception as e:
         print(f"SARSA error: {e}")
     env.close()
-
-    # ------------------------------------------------------------------
+    
     # Double Q-Learning Evaluation
-    # ------------------------------------------------------------------
     print("\n--- Challenge 2: Double Q-Learning (7 points) ---")
     env = HoverAviary(obs=ObservationType.KIN, act=ActionType.ONE_D_RPM, gui=False)
     try:
         q1, q2, rewards_dql = run_double_q_learning(env)
-        # Pass both tables so evaluation uses argmax(Q1+Q2) — the same
-        # selection rule as training, avoiding any averaging artefacts.
-        mean_dql, std_dql = evaluate_policy(env, q1, q_table2=q2)
-        pts = score_challenge(mean_dql, max_points=7)
-        total_points += pts
+        # Combine Q1 and Q2 for evaluation
+        q_combined = (q1 + q2) / 2
+        mean_dql, std_dql = evaluate_policy(env, q_combined)
         print(f"Double Q-Learning Evaluation: {mean_dql:.2f} (+/- {std_dql:.2f})")
-        print(f"Bonus Points: {pts}/7")
+        print(f"Bonus Points: {7 if mean_dql >= 300 else 0}/7")
     except Exception as e:
         print(f"Double Q-Learning error: {e}")
     env.close()
-
-    # ------------------------------------------------------------------
+    
     # Experience Replay Evaluation
-    # ------------------------------------------------------------------
     print("\n--- Challenge 3: Experience Replay (8 points) ---")
     env = HoverAviary(obs=ObservationType.KIN, act=ActionType.ONE_D_RPM, gui=False)
     try:
         q_table_replay, rewards_replay = run_td_with_replay(env)
         mean_replay, std_replay = evaluate_policy(env, q_table_replay)
-        pts = score_challenge(mean_replay, max_points=8)
-        total_points += pts
         print(f"Experience Replay Evaluation: {mean_replay:.2f} (+/- {std_replay:.2f})")
-        print(f"Bonus Points: {pts}/8")
+        print(f"Bonus Points: {8 if mean_replay >= 300 else 0}/8")
     except Exception as e:
         print(f"Experience Replay error: {e}")
     env.close()
-
+    
     print("\n" + "=" * 60)
-    print(f"TOTAL BONUS POINTS: {total_points}/20")
     print("BONUS CHALLENGES COMPLETE")
     print("=" * 60)
 
