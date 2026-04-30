@@ -1,0 +1,3 @@
+Algorithm,Success Rate,Collision Rate,Avg Episode Length,Avg Reward,Avg Min Obs Dist (m)
+SAC,0.0000,0.0000,400.00,-942.5439,0.8929
+TD3,0.0000,0.0000,400.00,-942.5439,0.8929
